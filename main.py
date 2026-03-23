@@ -5,23 +5,58 @@ from typing import List, Dict, Set, Tuple
 #Definios Variables iniciales como Tareas, Recursos y los resultados
 
 class Tarea:
-    def __init__(self, id_t: str, duracion: int, categorias: str):
+    def __init__(self, id_t: str, duracion: int, categoria: str):
         self.id = id_t
         self.duracion = duracion
         self.categoria = categoria
 
 class Recurso:
-    def __init__(self, id.r: str, categoria_enlazada: Set[str]):
+    def __init__(self, id_r: str, categoria_enlazada: Set[str]):
         self.id = id_r
         self.categoria = categoria_enlazada
-        self.tiempo_dispo = 0
+        self.tiempo_disponible = 0
 
 class Resultados:
-    def __init__(self, tarea_id: str, recurso_id: str, inicio: int, fin; int):
+    def __init__(self, tarea_id: str, recurso_id: str, inicio: int, fin: int):
         self.tarea_id = tarea_id
-        self:recurso_id = recurso_id
+        self.recurso_id = recurso_id
         self.inicio = inicio
         self.fin = fin
+
+class Base:
+    def __init__(self, tareas: List[Tarea], recursos: List[Recurso]):
+        self.tareas = tareas
+        self.recursos = recursos
+        self.cronograma: List[Resultados] = []
+
+    # Definimos la variable que ordena las tareas por duracion descendiente (O*n*ln(n))
+    def ejecutar_lpt(self) -> None:
+        tareas_ordenadas = sorted(self.tareas, key=lambda t: t.duracion, reverse=True)
+        for tarea in tareas_ordenadas:
+            compatibles = [r for r in self.recursos if tarea.categoria in r.categoria]
+
+            recurso_elegido = min(compatibles, key=lambda r: r.tiempo_disponible)
+
+            inicio = recurso_elegido.tiempo_disponible
+
+            fin = inicio + tarea.duracion
+
+            self.cronograma.append(Resultados(tarea.id, recurso_elegido.id, inicio, fin ))
+
+            recurso_elegido.tiempo_disponible = fin
+
+    def guardar_output(self) -> None:
+        # Realiza la salida del archivo de forma output.txt con formato CSV
+        with open('output.txt', 'w', encoding='utf-8', newline='') as f:
+            escritor = csv.writer(f)
+            for a in self.cronograma:
+                escritor.writerow([a.tarea_id, a.recurso_id, a.inicio, a.fin])
+
+
+
+
+
+
 
 
     
