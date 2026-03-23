@@ -57,13 +57,13 @@ class Base:
 def cargar_datos() -> Tuple[List[Tarea], List[Recurso]]:
     tareas: List[Tarea] = []
     recursos: List[Recurso] = []
-    with open('tareas.txt', 'r', encoding='utf-8') as f:
+    with open('tareas_EP.txt', 'r', encoding='utf-8') as f:
         lector = csv.reader(f)
         for fila in lector:
             if fila:
                 tareas.append(Tarea(fila[0].strip(), int(fila[1].strip()), fila[2].strip()))
     
-    with open('recursos.txt', 'r', encoding='utf-8') as f:
+    with open('recursos_EP.txt', 'r', encoding='utf-8') as f:
         lector = csv.reader(f)
         for fila in lector:
             if fila:
