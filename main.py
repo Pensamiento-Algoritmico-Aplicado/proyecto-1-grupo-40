@@ -2,7 +2,7 @@ import sys
 import csv
 from typing import List, Dict, Set, Tuple
 
-#Definios Variables iniciales como Tareas, Recursos y los resultados
+# Definimos Variables iniciales como Tareas, Recursos y los resultados
 
 class Tarea:
     def __init__(self, id_t: str, duracion: int, categoria: str):
@@ -29,7 +29,7 @@ class Base:
         self.recursos = recursos
         self.cronograma: List[Resultados] = []
 
-    # Definimos la variable que ordena las tareas por duracion descendiente (O*n*ln(n))
+    # Definimos la variable que ordena las tareas en orden de duracion descendiente (O*n*ln(n))
     def ejecutar_lpt(self) -> None:
         tareas_ordenadas = sorted(self.tareas, key=lambda t: t.duracion, reverse=True)
         for tarea in tareas_ordenadas:
@@ -51,6 +51,46 @@ class Base:
             escritor = csv.writer(f)
             for a in self.cronograma:
                 escritor.writerow([a.tarea_id, a.recurso_id, a.inicio, a.fin])
+
+# Definimos variables para leer y cargar "tareas.txt" y "recursos.txt"
+
+def cargar_datos() -> Tuple[List[Tarea], List[Recurso]]:
+    tareas: List[Tarea] = []
+    recursos: List[Recurso] = []
+    with open('tareas.txt', 'r', encoding='utf-8') as f:
+        lector = csv.reader(f)
+        for fila in lector:
+            if fila:
+                tareas.append(Tarea(fila[0].strip(), int(fila[1].strip()), fila[2].strip()))
+    
+    with open('recursos.txt', 'r', encoding='utf-8') as f:
+        lector = csv.reader(f)
+        for fila in lector:
+            if fila:
+                enlace = set(c.strip() for c in fila[1:])
+                recursos.append(Recurso(fila[0].strip(), enlace))
+    
+    return tareas, recursos
+
+# Ejecutar algoritmo y mostrar resultados
+
+def main() -> None:
+    if len(sys.argv) < 2:
+        print("Uso: python main.py <makespan_objetivo>")
+        return
+    
+    objetivo = float(sys.argv[1])
+
+    lista_tareas, lista_recursos = cargar_datos()
+    motor = Base(lista_tareas, lista_recursos)
+    motor.ejecutar_lpt()
+    motor.guardar_output()
+
+    mk_final = max(a.fin for a in motor.cronograma)
+    print(f"Makespan Obtenido: {mk_final} (Objetivo: {objetivo})")
+
+if __name__ == "__main__":
+    main()
 
 
 
